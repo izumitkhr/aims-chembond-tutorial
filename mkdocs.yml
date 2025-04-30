@@ -1,0 +1,16 @@
+site_name: Tutorial for aims-chembond
+nav:
+  - Home: index.md
+theme:
+  name: material
+  language: en
+  palette:
+    primary: teal
+    accent: teal
+  features:
+    - navigation.top
+    - content.code.copy
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - admonition
