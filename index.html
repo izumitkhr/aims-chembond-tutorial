@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#tutorial-for-aims_chembond-001" class="md-skip">
+        <a href="#tutorial-for-aims-chembond-v001" class="md-skip">
           Skip to content
         </a>
       
@@ -250,11 +250,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using" class="md-nav__link">
+  <a href="#compiling-fhi-aims" class="md-nav__link">
     <span class="md-ellipsis">
-      Using
+      Compiling FHI-aims
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-aims-chembond" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using aims-chembond
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using aims-chembond">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-fhi-aims" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running FHI-aims
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-aims-chembond" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running aims-chembond
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -311,11 +344,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using" class="md-nav__link">
+  <a href="#compiling-fhi-aims" class="md-nav__link">
     <span class="md-ellipsis">
-      Using
+      Compiling FHI-aims
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-aims-chembond" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using aims-chembond
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using aims-chembond">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-fhi-aims" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running FHI-aims
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-aims-chembond" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running aims-chembond
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -343,43 +409,57 @@
                   
 
 
-<h1 id="tutorial-for-aims_chembond-001">Tutorial for aims_chembond 0.0.1</h1>
+<h1 id="tutorial-for-aims-chembond-v001">Tutorial for aims-chembond (v0.0.1)</h1>
 <h2 id="about">About</h2>
-<p>aims_chembond is a post-processing tool to perform crystal orbital overlap population (COOP) analysis using FHI-aims.</p>
+<p>aims-chembond is a post-processing tool to perform crystal orbital overlap population (COOP) analysis using FHI-aims.</p>
 <p>The following projections are available:</p>
 <ul>
-<li>atom-projected DOS</li>
+<li>atom-projected DOS (Partial DOS)</li>
 <li>atom pair COOP</li>
 <li>orbital pair COOP</li>
 <li>atom-orbital pair COOP</li>
 </ul>
-<h2 id="using">Using</h2>
-<p>In <code>control.in</code>, specify the following:</p>
-<div class="highlight"><pre><span></span><code>output coop_set
+<h2 id="compiling-fhi-aims">Compiling FHI-aims</h2>
+<p>Add <code>set(USE_COOP ON CACHE STRING "")</code> to initial_cache.cmake, and compile following the same procedure as in the original FHI-aims.
+This should create the <code>aims.chembond.0.0.1.x</code> executable file of aims-chembond.</p>
+<h2 id="using-aims-chembond">Using aims-chembond</h2>
+<p>Using this functionality requires a two-step process. First, perform electronic structure calculations with FHI-aims, then use the results as input for aims-chembond to perform the chemical bonding analysis.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When using aims-chembond for COOP calculations in crystalline systems, care should be taken when interpreting COOP from primitive cell calculations. It is generally safer to perform calculations using a supercell. This is because when calculating COOP, the unit cell is expanded to a supercell, and the influence of equivalent atoms in adjacent unit cells is included in the results. </p>
+</div>
+<h3 id="running-fhi-aims">Running FHI-aims</h3>
+<p>In the <code>control.in</code> file, please add the following output specification:</p>
+<p><div class="highlight"><pre><span></span><code>output coop_set
 </code></pre></div>
-<p>This write command enables writing the following file:</p>
+This write command activates the generation of two output files:</p>
 <ul>
-<li><code>eigenvec.out</code> </li>
-<li><code>coop_set.out</code></li>
+<li>eigenvec.out - Contains eigenvector information</li>
+<li>coop_set.out - Contains the remaining information necessary for COOP analysis</li>
 </ul>
-<p>In order to to perform a COOP analysis, you need to create an input file <code>control_chembond.in</code> in the same folder, e.g. similar to the following:</p>
-<div class="highlight"><pre><span></span><code>output pdos -20 20 401 0.3
+<p>These files will serve as inputs for the subsequent chemical bonding analysis step with aims-chembond.</p>
+<h3 id="running-aims-chembond">Running aims-chembond</h3>
+<p>After performing the FHI-aims calculation, you will perform chemical bonding analysis using the <code>aims.chembond.0.0.1.x</code>. To use aims-chembond, you need three input files: eigenvec.out, coop_set.out, and control_chembond.in.</p>
+<p>aims-chembond provides functionality to calculate both PDOS (Partial Density of States) and COOP (Crystal Orbital Overlap Population). To calculate PDOS, include the following content in your control_chembond.in file:</p>
+<p><div class="highlight"><pre><span></span><code>output pdos -20 20 401 0.3
 atom 1
 atom 2
-
-output coop -20 20 401 0.3
+</code></pre></div>
+Here, <code>output pdos -20 20 401 0.3</code> defines the energy window parameters for the PDOS spectra: the lower bound, the upper bound, the number of points, and the Gaussian broadening factor. The <code>atom</code> tag specifies the atom index for which to calculate the PDOS.</p>
+<p>Similarly, to calculate COOP, include or append the following content to the control_chembond.in file:
+<div class="highlight"><pre><span></span><code>output coop -20 20 401 0.3
 atom_pair 1 2
 orbital_pair 3 18
 atom_orb_pair 1 3s 2 3p
 </code></pre></div>
-<p><code>output coop -20 20 401 0.3</code> defines the lower and the upper bound of the printed energy window, the number of points and the gaussian broadening.</p>
-<p>Now, run the executable <code>aims.chembond.0.0.1.x</code>. </p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
+In the example above, <code>atom_pair 1 2</code> calculates the COOP between atom 1 and atom 2. <code>orbital_pair 3 18</code> calculates the COOP between the 3rd orbital and the 18th orbital. <code>atom_orb_pair 1 3s 2 3p</code> calculates the COOP between the 3s orbital component of atom 1 and the 3p orbital component of atom 2.</p>
+<p>aims-chembond is parallelized across k-points. You can execute the calculation using MPI with a command like: <code>mpiexec -n 6 aims.chembond.0.0.1.x</code>.</p>
+<div class="admonition info">
+<p class="admonition-title">Information</p>
+<p>PDOS and COOP analyses are highly dependent on the choice of basis functions. While the "light" basis set offers a good starting point, you should carefully validate your results to ensure their accuracy and reliable interpretation.</p>
 </div>
-<p>When using this code for COOP calculations in crystalline systems, care should be taken when interpreting COOP from primitive cell calculations. It is generally safer to perform calculations using a supercell. This is because when calculating COOP, the unit cell is expanded to a supercell, and the influence of equivalent atoms in adjacent unit cells is included in the results. </p>
 <h2 id="citing">Citing</h2>
-<p>If you find this code helpful, please consider citing:</p>
+<p>If you find aims-chembond helpful, please consider citing:</p>
 <div class="highlight"><pre><span></span><code>Izumi Takahara, Kiyou Shibata, and Teruyasu Mizoguchi
 &quot;Crystal orbital overlap population based on all-electron ab initio simulation with numeric atom-centered orbitals and its application to chemical-bonding analysis in Li-intercalated layered materials&quot;
 Modelling Simul. Mater. Sci. Eng. 32 055028 (2024).
